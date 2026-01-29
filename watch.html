@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Video Player</title>
+<style>
+body {
+  background:#000;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+}
+
+video {
+  width:90%;
+  max-width:900px;
+  margin-top:30px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Video Player</h1>
+
+<video id="player" controls></video>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+if (!id) {
+  document.body.innerHTML = "<h2>No video ID</h2>";
+  throw "";
+}
+
+const videoURL =
+  "https://justcmlmao.github.io/videos/"
+  + id +
+  ".mp4";
+
+document.getElementById("player").src = videoURL;
+</script>
+
+</body>
+</html>
