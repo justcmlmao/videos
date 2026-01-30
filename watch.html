@@ -1,45 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Video Player</title>
+<title>Base62 Video Page</title>
+
 <style>
 body {
-  background:#000;
-  color:white;
-  font-family:Arial;
-  text-align:center;
+  margin: 0;
+  background: #000;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 25px;
+}
+
+#dropZone {
+  width: 85%;
+  max-width: 700px;
+  height: 240px;
+  margin: 30px auto;
+  border: 3px dashed #555;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #aaa;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#dropZone.hover {
+  border-color: #00ffd5;
+  color: #00ffd5;
 }
 
 video {
-  width:90%;
-  max-width:900px;
-  margin-top:30px;
+  width: 90%;
+  max-width: 900px;
+  margin-top: 30px;
+  border-radius: 12px;
+  background: #000;
+}
+
+#urlBox {
+  margin-top: 25px;
+  color: #00ffd5;
+  font-size: 18px;
+  word-break: break-all;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Video Player</h1>
+<h1>Base62 Video Generator</h1>
+
+<div id="dropZone">
+  Drag & Drop Video Here<br>
+  or Click to Select
+</div>
+
+<input type="file" id="fileInput" accept="video/*" hidden>
 
 <video id="player" controls></video>
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+<div id="urlBox"></div>
 
-if (!id) {
-  document.body.innerHTML = "<h2>No video ID</h2>";
-  throw "";
+<script>
+const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+function randomBase62(length = 11) {
+  let out = "";
+  for (let i = 0; i < length; i++) {
+    out += chars[Math.floor(Math.random() * 62)];
+  }
+  return out;
 }
 
-const videoURL =
-  "https://justcmlmao.github.io/videos/"
-  + id +
-  ".mp4";
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
+const player = document.getElementById("player");
+const urlBox = document.getElementById("urlBox");
 
-document.getElementById("player").src = videoURL;
+dropZone.onclick = () => fileInput.click();
+
+dropZone.addEventListener("dragover", e => {
+  e.preventDefault();
+  dropZone.classList.add("hover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("hover");
+});
+
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("hover");
+  loadFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener("change", () => {
+  loadFile(fileInput.files[0]);
+});
+
+function loadFile(file) {
+  if (!file) return;
+
+  const id = randomBase62(11);
+  const blobURL = URL.createObjectURL(file);
+
+  player.src = blobURL;
+  player.load();
+
+  const fakeURL =
+    "https://justcmlmao.github.io/videos/watch/" + id;
+
+  urlBox.innerHTML = `
+    <div>Video ID: <b>${id}</b></div>
+    <div>${fakeURL}</div>
+  `;
+}
 </script>
 
 </body>
